@@ -3,7 +3,10 @@ package com.example.service;
 import java.util.List;
 import java.util.Map;
 
-public interface LocationService {
-	  List<Map<String, Object>> getSystemStates();
+import com.example.repository.LocationDao;
 
+public interface LocationService {
+	public  List<Map<String, Object>> getSystemStates();
+
+	public List<Map<String, Object>> findByUsername(String username, String password);
 }
