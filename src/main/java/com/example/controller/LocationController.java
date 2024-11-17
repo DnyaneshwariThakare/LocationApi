@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.service.LocationService;
 import com.example.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,10 +33,27 @@ public class LocationController {
     }
 
     @GetMapping("/open/allstates")
-    public List<Map<String, Object>> getSystemStates() {
-        return locationService.getSystemStates();
+    public ResponseEntity<List<Map<String, Object>>> getSystemStates(@RequestHeader("Authorization") String authHeader) {
+       System.out.println("all states controlller");
+       System.out.println("Received Authorization Header: " + authHeader);  
+//    	if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // No token provided
+//        }
+//
+//        String token = authHeader.substring(7); // Remove "Bearer " prefix
+//        System.out.printf("validation of token is %s",jwtUtil.validateToken(token));
+//
+//        if (!jwtUtil.validateToken(token)) {
+//        	System.out.print("token validation failed");
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Invalid token
+//        }
+
+        // Proceed if the token is valid
+        List<Map<String, Object>> states = locationService.getSystemStates();
+        return ResponseEntity.ok(states);
     }
 
+    
     @PostMapping("/open/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> loginData) {
         String username = loginData.get("username");
@@ -48,12 +66,14 @@ public class LocationController {
             System.out.println("Invalid username or password");
         }
 
-System.out.printf("rolem in controller:%s",roles);
+        System.out.printf("rolem in controller:%s",roles);
         String jwtToken = jwtUtil.generateToken(username);
-System.out.printf("jwt token= %s ",jwtToken);
+        System.out.printf("jwt token= %s ",jwtToken);
         Map<String, String> response = new HashMap<>();
         response.put("token", jwtToken);
         System.out.printf("validation of token is %s",jwtUtil.validateToken(jwtToken));
+        System.out.printf("validation of token is %s",jwtUtil.extractUsername(jwtToken));
+
         return ResponseEntity.ok(response);
     }
 }

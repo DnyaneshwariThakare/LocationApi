@@ -11,7 +11,7 @@ import java.util.Date;
 public class JwtUtil {
 
     // Generate a secure signing key of sufficient length for HS512
-    private final SecretKey signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final SecretKey signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
    
     private final long jwtExpirationMs = 3600000; // 1 hour
 
@@ -21,7 +21,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour expiration
                 .signWith(signingKey)  // Use the secure signing key
                 .compact();
     }
@@ -41,6 +41,15 @@ public class JwtUtil {
 
     // Extract username from the token
     public String extractUsername(String token) {
+    	System.out.printf("token in extractUsername::%s and signingKey %s",token,signingKey);
+
+    	System.out.printf("username inside extract username",Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject());
+    	
         return Jwts.parserBuilder()
                 .setSigningKey(signingKey)
                 .build()
